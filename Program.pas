@@ -27,6 +27,14 @@ type
       var lTargetFile := lParameters.Switches["save-as"];
 
 
+      if length(lConnectionsFile) = 0 then
+        lConnectionsFile := Path.FirstFileThatExists(Path.ChangeExtension(lSchemaFileName, ".daConnections"));
+
+      if length(lConnectionsFile) = 0 then begin
+        writeLn("Name for .daConnections file must be specified with --connections switch, if it cannot be derrived from the schema name.");
+        exit 1;
+      end;
+
       var lConnectionManager := new ConnectionManager();
       (lConnectionManager as RemObjects.Common.Xml.IXmlSerializable).LoadFromFile(lConnectionsFile);
 
@@ -46,6 +54,14 @@ type
 
 
       RemObjects.DataAbstract.Server.Configuration.Load;
+
+      if (length(lConnectionName) = 0) and (lConnectionManager.ConnectionDefinitions.Count = 1)  then
+        lConnectionName := lConnectionManager.ConnectionDefinitions.First.Name;
+
+      if (length(lConnectionName) = 0) then begin
+        writeLn("Connection name must be specified with --connection-name switch, if more than one connection is defined");
+        exit 1;
+      end;
 
       var lConnectionDefinition := lConnectionManager.ConnectionDefinitions.FindItem(lConnectionName);
 
@@ -83,10 +99,18 @@ type
                 if assigned(lField) then begin
                   if lField.DataType = f.DataType then begin
                     //Log($"| | Database Field '{lMapping.Name}' has correct type.");
+                    if lField.DataType in [DataType.String,DataType.WideString] then begin
+                      if lField.Size ≠ f.Size then begin
+                        Log($"| | Database Field '{lMapping.Name}' has wrong size ({lField.Size}, should be {f.Size}).");
+                        lField.Size := f.Size;
+                      end;
+                    end;
                   end
                   else begin
                     Log($"| | Database Field '{lMapping.Name}' has wrong type ({lField.DataType}, should be {f.DataType}).");
                     lField.DataType := f.DataType;
+                    if lField.DataType in [DataType.String,DataType.WideString] then
+                      lField.Size := f.Size;
                   end;
                 end;
 
