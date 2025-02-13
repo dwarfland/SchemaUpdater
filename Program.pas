@@ -1,11 +1,11 @@
 ﻿namespace SchemaUpdater;
 
 uses
-  RemObjects.Common.Xml,
-  RemObjects.Common.Json,
   RemObjects.DataAbstract,
+  RemObjects.DataAbstract.Xml,
   RemObjects.DataAbstract.Server,
-  RemObjects.DataAbstract.Schema;
+  RemObjects.DataAbstract.Schema,
+  RemObjects.Elements.RTL;
 
 uses
   RemObjects.DataAbstract.ConnectionDriver;
@@ -36,12 +36,14 @@ type
       end;
 
       var lConnectionManager := new ConnectionManager();
-      (lConnectionManager as RemObjects.Common.Xml.IXmlSerializable).LoadFromFile(lConnectionsFile);
+      (lConnectionManager as IXmlSerializable).LoadFromFile(lConnectionsFile);
 
       var lSchema := new ServiceSchema;
       if lSchemaFileName.FileExists then begin
         lSchema.LoadFromFile(lSchemaFileName);
         Log($"Current file format is {lSchema.FileFormat}");
+        if assigned(lSchema.Namespace) then
+          Log($"Namespace is {lSchema.Namespace}");
       end
       else if assigned(lParameters.Switches["create"]) then begin
         lSchema.FileFormat := SerializableFormat.Json;
@@ -72,31 +74,43 @@ type
       var lDefaultConnectionType := "";//lConnection.ConnectionType;
       var lDefaultConnectionName := lConnection.Name;
 
+      var lSubTypes := GetNpgsqlSubTypes(lConnection.ConnectionString);
+
       //
       // new tables
       //
 
       var lTableNames := lConnection.GetTableNames();
-      for each t in lTableNames.OrderBy(t -> t)/*.Where(t -> t = "process_instance_logs")*/ do try
+      for each t in lTableNames.OrderBy(t -> t)/*.Wheresuperr(t -> t = "process_instance_logs")*/ do try
 
         var lTableName := t;
         if assigned(lParameters.Switches["strip-prefixes"]) then
           lTableName := String(lTableName).SubstringFromLastOccurrenceOf(".");
+
+        //if lTableName ≠ "filetypes" then
+          //continue;
+
         var lDataTable := lSchema.DataTables.FirstOrDefault(d -> d.Name = lTableName);
         var lMetadata := lConnectionDriver.GetTableMetadata(t);
 
         if assigned(lDataTable) then begin
-
           Log($"Data Table '{lTableName}' exists in schema.");
 
           for each s in lDataTable.Statements do begin
             Log($"| Data Table Statement '{s.Name}'.");
+
             for each f in lMetadata.Fields do begin
+
+              var lSubType := lSubTypes[$"{lTableName}|{f.Name}"];
+              if lSubType not in ["json", "jsonb", ""] then
+                lSubType := nil;
+
               var lMapping := s.ColumnMappings.FirstOrDefault(cm -> cm.TableField = f.Name);
               if assigned(lMapping) then begin
                 //Log($"| | Database Field '{lMapping.Name}' is present in schema.");
-                var lField := lDataTable.Fields[lMapping.Name];
+                var lField := if lDataTable.Fields.Contains(lMapping.Name) then lDataTable.Fields[lMapping.Name];
                 if assigned(lField) then begin
+
                   if lField.DataType = f.DataType then begin
                     //Log($"| | Database Field '{lMapping.Name}' has correct type.");
                     if lField.DataType in [DataType.String,DataType.WideString] then begin
@@ -111,13 +125,27 @@ type
                     lField.DataType := f.DataType;
                     if lField.DataType in [DataType.String,DataType.WideString] then
                       lField.Size := f.Size;
+                    lField.Required := f.Required;
                   end;
+                  lField.Required := f.Required;
+                  if assigned(lSubType) then
+                    lField.CustomAttributes := "subtype="+lSubType;
+
+                end
+                else begin
+                  Log($"| | Database Field '{f.Name}' was mapped, but is missing in schema. Added.");
+                  f.Name := lMapping.Name;
+                  lDataTable.Fields.Add(f);
+                  if assigned(lSubType) then
+                    f.CustomAttributes := "subtype="+lSubType;
                 end;
 
               end
               else begin
                 Log($"| | Database Field '{f.Name}' missing in schema. Added");
                 lDataTable.Fields.Add(f);
+                if assigned(lSubType) then
+                  f.CustomAttributes := "subtype="+lSubType;
                 s.ColumnMappings.Add(new SchemaColumnMapping(f.Name, f.Name, f.Name));
               end;
             end;
@@ -130,6 +158,7 @@ type
               else begin
                 Log($"| | Schema Field '{cm.Name}' missing in database. Removed");
                 lDataTable.Fields.Remove(cm.Name);
+                var lMapping := s.ColumnMappings.FirstOrDefault(cm2 -> cm2.TableField = cm.Name);
                 s.ColumnMappings.Remove(cm);
               end;
             end;
@@ -195,6 +224,28 @@ type
       end;
       lSchema.SaveToFile(coalesce(lTargetFile, lSchemaFileName));
 
+    end;
+
+    class method GetNpgsqlSubTypes(aConnectionString: String): Dictionary<String,String>;
+    begin
+      result := new;
+      using lConnection := new Npgsql.NpgsqlConnection(aConnectionString.SubstringFromFirstOccurrenceOf("?")) do begin
+        lConnection.Open();
+
+        var lQuery := 'SELECT table_name, column_name, udt_name FROM information_schema.columns';
+
+        using lCommand := new Npgsql.NpgsqlCommand(lQuery, lConnection) do begin
+          using lReader := lCommand.ExecuteReader() do begin
+            while lReader.Read() do begin
+              var lTableName := lReader.GetString(0);
+              var lColumnName := lReader.GetString(1);
+              var lSubType := lReader.GetString(2); // 'jsonb', 'text', 'int4', etc.
+              result[$"{lTableName}|{lColumnName}"] := lSubType;
+              //Log($'Column: {lTableName}.{lColumnName}, Type: {lSubType}');
+            end;
+          end;
+        end;
+      end;
     end;
 
   end;

@@ -9,7 +9,6 @@
     <ApplicationIcon>Properties\App.ico</ApplicationIcon>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <TargetFramework>.NETFramework4.8</TargetFramework>
-    <DefaultUses>RemObjects.Elements.RTL</DefaultUses>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
@@ -38,36 +37,73 @@
     </Reference>
     <Reference Include="RemObjects.DataAbstract">
       <Private>True</Private>
+      <HintPath>..\rofx-win\Data Abstract for .NET\Bin\RemObjects.DataAbstract.dll</HintPath>
     </Reference>
     <Reference Include="RemObjects.SDK">
       <Private>True</Private>
-      <HintPath>..\..\Code\RemObjects\rofx-win\RemObjects SDK for .NET\Bin\RemObjects.SDK.dll</HintPath>
+      <HintPath>..\rofx-win\Data Abstract for .NET\Bin\RemObjects.SDK.dll</HintPath>
     </Reference>
     <Reference Include="RemObjects.DataAbstract.Server">
       <Private>True</Private>
+      <HintPath>..\rofx-win\Data Abstract for .NET\Bin\RemObjects.DataAbstract.Server.dll</HintPath>
     </Reference>
     <Reference Include="RemObjects.SDK.Server">
       <Private>True</Private>
-    </Reference>
-    <Reference Include="RemObjects.SDK.ZeroConf">
-      <Private>True</Private>
+      <HintPath>..\rofx-win\Data Abstract for .NET\Bin\RemObjects.SDK.Server.dll</HintPath>
     </Reference>
     <NuGetReference Include="Npgsql:*">
       <Private>True</Private>
     </NuGetReference>
-    <Reference Include="RemObjects.DataAbstract.SchemaModeler.ConnectionDriver">
-      <HintPath>..\rofx-win\Data Abstract\Bin\Schema Modeler\RemObjects.DataAbstract.SchemaModeler.ConnectionDriver.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="RemObjects.DataAbstract.SchemaModeler.Services">
-      <HintPath>..\rofx-win\Data Abstract\Bin\Schema Modeler\RemObjects.DataAbstract.SchemaModeler.Services.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Content Include="Properties\App.ico" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\Delegates.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\MethodExecutionEntry.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\TypeConversionHelpers.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\Wrappers\AuxDriverInfo.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\Wrappers\CommandParameter.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\Wrappers\DriverInfo.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\Wrappers\DriverMapping.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\DatabaseLocationType.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\DataType.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\DriverTypeFilter.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\ICommandParameter.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\IConnectionInformationProvider.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\IDataProvider.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\IDataProviderProfile.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\IDriverMapping.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Interfaces\ParameterDirection.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Interfaces\IEncryptionService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Interfaces\IFileDialogService.pas" />
+    <None Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Interfaces\IMessageBoxService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Interfaces\IRegistryService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Interfaces\IStorageService.pas" />
+    <None Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Implementation\EncryptionService.pas" />
+    <None Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Implementation\FileDialogService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Implementation\LogService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Implementation\RegistryService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Implementation\StorageService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\SimpleContainer\Container.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\SimpleContainer\ContainerException.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Implementation\UnmanagedDriver.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\IAuxDriverInfo.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\ICodeGenerator.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\ICommandParameter.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\IConnectionInformation.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\IDriverInfo.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\IDriverManager.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\IDriverMapping.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Interfaces\IPlugin.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Plugin\Plugin.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Unmanaged\Plugin\PluginLoader.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Managed\Implementation\ManagedDriver.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.Services\Interfaces\ILogService.pas" />
+    <Compile Include="..\rofx-win\Data Abstract\Tools\SchemaModeler7\SchemaModeler.ConnectionDriver\Implementation\ConnectionDriver.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>
